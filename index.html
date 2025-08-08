@@ -458,12 +458,14 @@
   // Estado global
   let isAdmin = false;
   let data = []; // Array de objetos {nombre, puntos, detalles: [{fecha, puntos, motivo, id}]}
-  let puntosGanadosMotivos = [
+  
+  // Usamos localStorage para los motivos porque no se guardan en Sheets.
+  let puntosGanadosMotivos = JSON.parse(localStorage.getItem("puntosGanadosMotivos")) || [
     { motivo: "Saber de memoria su parte", puntos: 5 },
     { motivo: "Exponer bien", puntos: 3 },
     { motivo: "Actitud positiva", puntos: 2 },
   ];
-  let puntosPerdidosMotivos = [
+  let puntosPerdidosMotivos = JSON.parse(localStorage.getItem("puntosPerdidosMotivos")) || [
     { motivo: "Faltar a reunión sin aviso", puntos: 4 },
     { motivo: "No preparar tarea", puntos: 3 },
     { motivo: "Interrumpir a otra hermana", puntos: 1 },
@@ -550,7 +552,7 @@
       hidePasswordModal();
       renderRanking();
       renderPointsGiven();
-      renderInfoList();
+      renderMotivos();
     } else {
       passwordError.style.display = "block";
       adminPasswordInput.focus();
@@ -561,6 +563,12 @@
       adminLoginBtn.click();
     }
   });
+  
+  // Guardar motivos en localStorage
+  function saveMotivos() {
+    localStorage.setItem("puntosGanadosMotivos", JSON.stringify(puntosGanadosMotivos));
+    localStorage.setItem("puntosPerdidosMotivos", JSON.stringify(puntosPerdidosMotivos));
+  }
 
   // -------------------------------------------------------------
   // Funciones de Carga y Guardado de datos para Google Sheets
@@ -644,7 +652,6 @@
     // Restar puntos antes de eliminar
     user.puntos -= user.detalles[idx].puntos;
     user.detalles.splice(idx, 1);
-    // La línea para evitar puntos negativos se ha eliminado.
     if (user.detalles.length === 0 && user.puntos === 0) {
       // Si el usuario no tiene puntos ni registros, lo eliminamos del ranking
       data = data.filter(d => d.nombre !== user.nombre);
@@ -678,6 +685,8 @@
 
       const tdPuntos = document.createElement("td");
       tdPuntos.textContent = user.puntos;
+      tdPuntos.style.color = user.puntos >= 0 ? 'green' : 'red';
+      if (user.puntos === 0) tdPuntos.style.color = '#666';
 
       tr.appendChild(tdPos);
       tr.appendChild(tdNombre);
@@ -790,7 +799,7 @@
       btn.addEventListener("click", () => {
         if (confirm(`Eliminar motivo para ganar puntos: "${item.motivo}"?`)) {
           puntosGanadosMotivos.splice(i, 1);
-          saveData();
+          saveMotivos();
           renderMotivos();
           renderInfoList();
         }
@@ -810,7 +819,7 @@
       btn.addEventListener("click", () => {
         if (confirm(`Eliminar motivo para perder puntos: "${item.motivo}"?`)) {
           puntosPerdidosMotivos.splice(i, 1);
-          saveData();
+          saveMotivos();
           renderMotivos();
           renderInfoList();
         }
@@ -886,6 +895,7 @@
     puntosGanadosMotivos.push({ motivo: mot, puntos: pts });
     gananMotivoInput.value = "";
     gananPuntosInput.value = "";
+    saveMotivos();
     renderMotivos();
     renderInfoList(true);
   });
@@ -899,6 +909,7 @@
     puntosPerdidosMotivos.push({ motivo: mot, puntos: pts });
     pierdenMotivoInput.value = "";
     pierdenPuntosInput.value = "";
+    saveMotivos();
     renderMotivos();
     renderInfoList(false);
   });
