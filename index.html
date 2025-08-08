@@ -449,17 +449,16 @@
     Contraseña incorrecta. Intenta de nuevo.
   </div>
 </div>
-
 <script>
 (() => {
   const PASSWORD = "jeroforlife";
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyqHwYNgdAznaIrE8YihDPXlpzWdhbUWTIqrfMDQs2vEKij2Acyu0pyMtX6JSP3EziySQ/exec";
+  const SCRIPT_URL = "TU_URL_DE_SCRIPT_AQUI"; // REEMPLAZA ESTA LÍNEA
 
   // Estado global
   let isAdmin = false;
   let data = []; // Array de objetos {nombre, puntos, detalles: [{fecha, puntos, motivo, id}]}
   
-  // Usamos localStorage para los motivos porque no se guardan en Sheets.
+  // Usamos localStorage para los motivos
   let puntosGanadosMotivos = JSON.parse(localStorage.getItem("puntosGanadosMotivos")) || [
     { motivo: "Saber de memoria su parte", puntos: 5 },
     { motivo: "Exponer bien", puntos: 3 },
@@ -527,7 +526,6 @@
   // Al hacer click en el botón modo admin, pedir contraseña
   toggleAdminBtn.addEventListener("click", () => {
     if (isAdmin) {
-      // Salir del modo admin
       isAdmin = false;
       adminPanel.classList.add("hidden");
       toggleAdminBtn.textContent = "Modo Organizadora 🔐";
@@ -535,7 +533,7 @@
       hidePasswordModal();
       renderRanking();
       renderPointsGiven();
-      renderInfoList(); // refrescar info en modo normal
+      renderInfoList();
     } else {
       showPasswordModal();
     }
@@ -577,17 +575,15 @@
   // Guardar un nuevo registro en Google Sheets
   async function savePointToSheet(entry) {
     try {
-      const response = await fetch(SCRIPT_URL, {
+      await fetch(SCRIPT_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ ...entry, action: 'addPoints' }),
       });
-      await response.json();
     } catch (error) {
       console.error('Error al guardar datos en Google Sheets:', error);
-      alert("Hubo un error al guardar los puntos. Por favor, revisa la configuración de Google Apps Script.");
     }
   }
 
@@ -597,7 +593,6 @@
       const response = await fetch(SCRIPT_URL);
       const rawData = await response.json();
       
-      // Procesar los datos de la hoja para generar el ranking y los detalles
       const processedData = rawData.reduce((acc, row) => {
         const nombre = row.Nombre;
         const puntos = Number(row.Puntos);
@@ -616,8 +611,6 @@
       }, []);
       
       data = processedData;
-
-      // Actualizar el ID para nuevos registros
       nextDetailId = data.reduce((max, user) => {
         const maxId = user.detalles.reduce((maxDet, det) => Math.max(maxDet, det.id), 0);
         return Math.max(max, maxId);
@@ -644,22 +637,19 @@
   }
 
   // Borrar punto dado (modo admin)
-  function removePoint(nombre, id) {
-    const user = data.find((d) => d.nombre.toLowerCase() === nombre.toLowerCase());
-    if (!user) return;
-    const idx = user.detalles.findIndex((det) => det.id === id);
-    if (idx === -1) return;
-    // Restar puntos antes de eliminar
-    user.puntos -= user.detalles[idx].puntos;
-    user.detalles.splice(idx, 1);
-    if (user.detalles.length === 0 && user.puntos === 0) {
-      // Si el usuario no tiene puntos ni registros, lo eliminamos del ranking
-      data = data.filter(d => d.nombre !== user.nombre);
+  async function removePoint(nombre, id) {
+    try {
+      await fetch(SCRIPT_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ action: 'removePoints', id: id }),
+      });
+      await loadData();
+    } catch (error) {
+      console.error('Error al eliminar el punto:', error);
     }
-    // Nota: Este cambio no se guardará en Google Sheets. Para esto,
-    // se necesitaría una función adicional en Apps Script que permita borrar filas.
-    renderRanking();
-    renderPointsGiven();
   }
 
   // Renderizar ranking (ordenado)
@@ -748,8 +738,6 @@
             if (confirm(`¿Eliminar el registro "${det.motivo}" (${det.puntos} puntos) de ${nombre}?`)) {
               removePoint(nombre, det.id);
               showDetails(nombre);
-              renderRanking();
-              renderPointsGiven();
             }
           });
           tdAccion.appendChild(btnBorrar);
