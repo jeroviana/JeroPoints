@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Jero Points</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@500&display=swap');
+  /* Paleta rosa y arcoiris */
+  :root {
+    --rosa: #ff66b2;
+    --rosa-claro: #ffe6f0;
+    --rojo: #ff4d4d;
+    --naranja: #ff9933;
+    --amarillo: #ffcc00;
+    --verde: #33cc66;
+    --celeste: #66ccff;
+    --azul: #3399ff;
+    --lila: #cc99ff;
+    --gris-claro: #f9f9f9;
+    --gris-medio: #ddd;
+    --gris-oscuro: #666;
+  }
+  body {
+    font-family: 'Quicksand', sans-serif;
+    background: var(--rosa-claro);
+    color: #333;
+    margin: 0;
+    padding: 1rem 2rem 3rem 2rem;
+    min-height: 100vh;
+    user-select: none;
+  }
+  h1, h2, h3 {
+    color: var(--rosa);
+    margin-bottom: 0.5rem;
+    text-align: center;
+  }
+  h1 {
+    font-size: 2.8rem;
+    margin-bottom: 1rem;
+    text-shadow:
+      1px 1px var(--rojo),
+      2px 2px var(--naranja),
+      3px 3px var(--amarillo),
+      4px 4px var(--verde),
+      5px 5px var(--celeste),
+      6px 6px var(--azul),
+      7px 7px var(--lila);
+  }
+  main {
+    max-width: 900px;
+    margin: auto;
+    background: white;
+    border-radius: 15px;
+    box-shadow:
+      0 0 8px var(--rosa),
+      0 0 25px var(--lila);
+    padding: 1.5rem 2rem 2rem 2rem;
+  }
+
+  /* Botones */
+  button {
+    background: var(--rosa);
+    border: none;
+    color: white;
+    font-weight: 600;
+    padding: 0.45rem 1rem;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    box-shadow: 0 0 8px var(--rosa);
+    user-select: none;
+  }
+  button:hover, button:focus {
+    background: var(--rojo);
+    outline: none;
+    box-shadow:
+      0 0 15px var(--rojo),
+      0 0 35px var(--naranja);
+  }
+
+  /* Botones info */
+  .btn-info-list {
+    background: linear-gradient(90deg, var(--rojo), var(--naranja), var(--amarillo), var(--verde), var(--celeste), var(--azul), var(--lila));
+    font-weight: 700;
+    font-size: 0.95rem;
+    box-shadow: 0 0 12px var(--lila);
+    margin-right: 1rem;
+    user-select:none;
+  }
+  .btn-info-list:hover, .btn-info-list:focus {
+    filter: brightness(1.2);
+  }
+
+  /* Toggle modo admin */
+  #toggleAdminBtn {
+    position: fixed;
+    top: 12px;
+    right: 12px;
+    z-index: 1001;
+    padding: 0.45rem 1rem;
+    font-size: 1rem;
+    box-shadow:
+      0 0 12px var(--rosa);
+  }
+
+  /* Formulario modo admin */
+  #adminPanel {
+    background: var(--rosa-claro);
+    border: 2px solid var(--rosa);
+    border-radius: 15px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 0 15px var(--lila);
+  }
+  form label {
+    display: block;
+    font-weight: 600;
+    margin-top: 0.8rem;
+    margin-bottom: 0.25rem;
+    color: var(--rosa);
+  }
+  input[type="text"], input[type="number"], input[type="password"] {
+    width: 100%;
+    padding: 0.5rem 0.6rem;
+    border: 2px solid var(--rosa);
+    border-radius: 10px;
+    font-size: 1rem;
+    font-family: inherit;
+  }
+  input[type="text"]:focus, input[type="number"]:focus, input[type="password"]:focus {
+    outline: none;
+    border-color: var(--rojo);
+    box-shadow: 0 0 8px var(--rojo);
+  }
+  .form-row {
+    margin-bottom: 0.6rem;
+  }
+  .btn-submit {
+    margin-top: 1rem;
+    width: 100%;
+  }
+  #pointsGivenList, #gananListAdmin, #pierdenListAdmin {
+    max-height: 150px;
+    overflow-y: auto;
+    border: 1.5px solid var(--rosa);
+    border-radius: 10px;
+    background: var(--rosa-claro);
+    padding: 0.6rem 1rem;
+    box-shadow: inset 0 0 6px var(--lila);
+  }
+  .list-item {
+    background: white;
+    border-radius: 12px;
+    margin-bottom: 0.4rem;
+    padding: 0.3rem 0.6rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 500;
+    color: var(--gris-oscuro);
+  }
+  .list-item button {
+    background: var(--rojo);
+    padding: 0 8px;
+    border-radius: 100%;
+    font-weight: 700;
+    box-shadow: none;
+    font-size: 0.9rem;
+    transition: background 0.25s ease;
+  }
+  .list-item button:hover {
+    background: var(--naranja);
+    color: white;
+  }
+
+  /* Tabla ranking */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 0.7rem;
+  }
+  caption {
+    text-align: left;
+    font-weight: 700;
+    color: var(--rosa);
+    margin-bottom: 0.3rem;
+  }
+  thead tr {
+    background: linear-gradient(90deg, var(--rojo), var(--naranja), var(--amarillo), var(--verde), var(--celeste), var(--azul), var(--lila));
+    color: white;
+    font-weight: 700;
+  }
+  tbody tr {
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+  tbody tr:hover, tbody tr:focus-within {
+    background: var(--rosa-claro);
+  }
+  th, td {
+    padding: 0.5rem 0.75rem;
+    border-bottom: 1px solid var(--gris-medio);
+    text-align: left;
+  }
+  th:first-child, td:first-child {
+    text-align: center;
+    width: 5%;
+  }
+  th:nth-child(2), td:nth-child(2) {
+    width: 45%;
+  }
+  th:nth-child(3), td:nth-child(3) {
+    width: 20%;
+    text-align: center;
+  }
+
+  /* Medallas de los 3 primeros */
+  .medalla {
+    font-size: 1.3rem;
+    margin-right: 8px;
+    vertical-align: middle;
+  }
+  .oro {
+    color: #FFD700;
+    text-shadow:
+      1px 1px 2px #b38700;
+  }
+  .plata {
+    color: #C0C0C0;
+    text-shadow:
+      1px 1px 2px #777;
+  }
+  .bronce {
+    color: #cd7f32;
+    text-shadow:
+      1px 1px 2px #7a4f1e;
+  }
+
+  /* Detalle puntos */
+  #detailsSection {
+    margin-top: 1.2rem;
+    background: var(--rosa-claro);
+    border-radius: 15px;
+    padding: 1rem;
+    box-shadow: 0 0 12px var(--lila);
+  }
+  #detailsBody td, #detailsBody th {
+    padding: 0.4rem 0.8rem;
+  }
+  #detailsBody tr:hover {
+    background: var(--rosa);
+    color: white;
+  }
+  #detailsBody button {
+    background: var(--rojo);
+    padding: 0.2rem 0.5rem;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    display: none; /* Oculto por defecto, se muestra en admin */
+    cursor: pointer;
+  }
+  #detailsBody button.show-in-admin {
+    display: inline-block;
+  }
+  #closeDetailsBtn {
+    margin-top: 0.7rem;
+    background: var(--lila);
+    color: var(--rosa);
+    font-weight: 700;
+  }
+
+  /* Info botones */
+  #pointsInfoList {
+    margin-top: 0.8rem;
+    padding: 0.7rem 1rem;
+    background: var(--rosa-claro);
+    border-radius: 12px;
+    box-shadow: inset 0 0 8px var(--lila);
+    max-height: 180px;
+    overflow-y: auto;
+  }
+
+  /* Oculto y visible */
+  .hidden {
+    display: none !important;
+  }
+
+  /* Modal contraseña */
+  #passwordModal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--rosa-claro);
+    border: 2px solid var(--rosa);
+    box-shadow: 0 0 25px var(--lila);
+    border-radius: 15px;
+    padding: 1.3rem 2rem;
+    z-index: 9999;
+    max-width: 320px;
+    width: 90%;
+    display: none;
+  }
+  #passwordModal.show {
+    display: block;
+  }
+  #adminPasswordInput {
+    width: 100%;
+    padding: 0.6rem 0.7rem;
+    font-size: 1.2rem;
+    border-radius: 12px;
+    border: 2px solid var(--rosa);
+    margin-top: 0.8rem;
+    outline-offset: 2px;
+  }
+  #adminLoginBtn {
+    margin-top: 1rem;
+    width: 100%;
+  }
+  #passwordError {
+    color: var(--rojo);
+    font-weight: 700;
+    margin-top: 0.6rem;
+    text-align: center;
+    display: none;
+  }
+
+  /* Responsive */
+  @media (max-width: 600px) {
+    body {
+      padding: 1rem 1rem 2rem 1rem;
+    }
+    main {
+      padding: 1rem 1rem 1.5rem 1rem;
+    }
+    #adminPanel {
+      padding: 1rem;
+    }
+    table, th, td {
+      font-size: 0.9rem;
+    }
+    .btn-info-list {
+      font-size: 0.85rem;
+      margin-bottom: 0.6rem;
+      width: 48%;
+    }
+  }
+</style>
+</head>
+<body>
+
+<button id="toggleAdminBtn" aria-pressed="false" aria-label="Activar modo organizadora">Modo Organizadora 🔐</button>
+
+<main>
+  <h1>Jero Points</h1>
+
+  <!-- Panel admin -->
+  <section id="adminPanel" class="hidden" aria-live="polite" aria-atomic="true" aria-label="Panel de modo organizadora">
+    <form id="addPointsForm" aria-label="Formulario para agregar puntos">
+      <div class="form-row">
+        <label for="nameInput">Nombre de hermana</label>
+        <input id="nameInput" type="text" autocomplete="off" placeholder="Ej: Sol Volpe" required />
+      </div>
+      <div class="form-row">
+        <label for="pointsInput">Cantidad de puntos</label>
+        <input id="pointsInput" type="number" min="1" step="1" required />
+      </div>
+      <div class="form-row">
+        <label for="reasonInput">Motivo</label>
+        <input id="reasonInput" type="text" autocomplete="off" placeholder="Ej: Excelente exposición" required />
+      </div>
+      <button type="submit" class="btn-submit">Agregar puntos</button>
+    </form>
+
+    <h3>Lista de puntos dados</h3>
+    <div id="pointsGivenList" aria-live="polite" aria-atomic="true">
+      <!-- Items de puntos dados aparecerán aquí -->
+    </div>
+
+    <h2>Administrar motivos</h2>
+    <div style="display:flex; gap: 1.5rem; flex-wrap: wrap;">
+      <div style="flex: 1 1 48%;">
+        <h3>¿Cómo se ganan puntos?</h3>
+        <form id="formGanan" aria-label="Agregar motivo para ganar puntos">
+          <input id="gananMotivoInput" type="text" placeholder="Nuevo motivo..." autocomplete="off" required />
+          <input id="gananPuntosInput" type="number" min="1" step="1" placeholder="Puntos" required />
+          <button type="submit">Agregar</button>
+        </form>
+        <div id="gananListAdmin" class="points-list" aria-live="polite" aria-atomic="true"></div>
+      </div>
+      <div style="flex: 1 1 48%;">
+        <h3>¿Cómo se pierden puntos?</h3>
+        <form id="formPierden" aria-label="Agregar motivo para perder puntos">
+          <input id="pierdenMotivoInput" type="text" placeholder="Nuevo motivo..." autocomplete="off" required />
+          <input id="pierdenPuntosInput" type="number" min="1" step="1" placeholder="Puntos" required />
+          <button type="submit">Agregar</button>
+        </form>
+        <div id="pierdenListAdmin" class="points-list" aria-live="polite" aria-atomic="true"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Tabla de ranking -->
+  <section aria-label="Tabla de posiciones de Jero Points">
+    <h2 class="section-title">Ranking de Jero Points ✨</h2>
+    <table aria-describedby="rankingDescription" role="table" style="table-layout:fixed;">
+      <caption id="rankingDescription" class="sr-only">Tabla con nombres de hermanas y sus puntos</caption>
+      <thead>
+        <tr>
+          <th style="width: 5%;">#</th>
+          <th style="width: 45%;">Nombre</th>
+          <th style="width: 20%;">Puntos</th>
+        </tr>
+      </thead>
+      <tbody id="rankingBody" role="rowgroup" aria-live="polite" aria-relevant="all">
+        <!-- Filas dinámicas -->
+      </tbody>
+    </table>
+
+    <div id="detailsSection" class="hidden" aria-live="polite" aria-atomic="true" style="margin-top:1.2rem;">
+      <h3>Detalle de puntos</h3>
+      <table role="table" aria-describedby="detailsDescription" style="table-layout: fixed; width: 100%;">
+        <caption id="detailsDescription" class="sr-only">Detalle de puntos ganados o perdidos por motivo y fecha</caption>
+        <thead>
+          <tr>
+            <th style="width: 25%;">Fecha</th>
+            <th style="width: 15%;">Puntos</th>
+            <th style="width: 45%;">Motivo</th>
+            <th style="width: 15%;">Acción</th>
+          </tr>
+        </thead>
+        <tbody id="detailsBody">
+          <!-- Detalles dinámicos -->
+        </tbody>
+      </table>
+      <button id="closeDetailsBtn" style="margin-top:0.5rem;">Cerrar detalle</button>
+    </div>
+  </section>
+
+  <div style="margin-top:1.5rem; user-select:none; text-align:center;">
+    <button class="btn-info-list" id="showPointsInfoBtn" aria-expanded="false" aria-controls="pointsInfoList">¿Cómo se ganan puntos?</button>
+    <button class="btn-info-list" id="showPointsLostBtn" aria-expanded="false" aria-controls="pointsInfoList">¿Cómo se pierden puntos?</button>
+    <div id="pointsInfoList" class="points-list hidden" role="region" aria-live="polite" aria-atomic="true" style="margin-top:0.7rem;"></div>
+  </div>
+</main>
+
+<!-- Modal contraseña -->
+<div id="passwordModal" class="password-container" role="dialog" aria-modal="true" aria-labelledby="modalTitle" aria-hidden="true" style="display:none;">
+  <h3 id="modalTitle" style="color: var(--rosa);">Modo Organizadora - Ingresá la contraseña</h3>
+  <input type="password" id="adminPasswordInput" aria-describedby="passwordHelp" placeholder="Contraseña" autocomplete="off" />
+  <button id="adminLoginBtn">Entrar</button>
+  <div id="passwordError" class="error-msg" role="alert" aria-live="assertive" style="display:none; color: var(--rojo); font-weight: 700; margin-top: 0.5rem; text-align:center;">
+    Contraseña incorrecta. Intenta de nuevo.
+  </div>
+</div>
+
+<script>
+(() => {
+  const PASSWORD = "jeroforlife";
+
+  // Estado global
+  let isAdmin = false;
+  let data = []; // Array de objetos {nombre, puntos, detalles: [{fecha, puntos, motivo, id}]}
+  let puntosGanadosMotivos = [
+    { motivo: "Saber de memoria su parte", puntos: 5 },
+    { motivo: "Exponer bien", puntos: 3 },
+    { motivo: "Actitud positiva", puntos: 2 },
+  ];
+  let puntosPerdidosMotivos = [
+    { motivo: "Faltar a reunión sin aviso", puntos: 4 },
+    { motivo: "No preparar tarea", puntos: 3 },
+    { motivo: "Interrumpir a otra hermana", puntos: 1 },
+  ];
+
+  // Para dar ID único a cada entrada de puntos
+  let nextDetailId = 1;
+
+  // Elementos DOM
+  const toggleAdminBtn = document.getElementById("toggleAdminBtn");
+  const adminPanel = document.getElementById("adminPanel");
+  const passwordModal = document.getElementById("passwordModal");
+  const adminPasswordInput = document.getElementById("adminPasswordInput");
+  const adminLoginBtn = document.getElementById("adminLoginBtn");
+  const passwordError = document.getElementById("passwordError");
+
+  const rankingBody = document.getElementById("rankingBody");
+  const detailsSection = document.getElementById("detailsSection");
+  const detailsBody = document.getElementById("detailsBody");
+  const closeDetailsBtn = document.getElementById("closeDetailsBtn");
+
+  const pointsGivenList = document.getElementById("pointsGivenList");
+
+  const showPointsInfoBtn = document.getElementById("showPointsInfoBtn");
+  const showPointsLostBtn = document.getElementById("showPointsLostBtn");
+  const pointsInfoList = document.getElementById("pointsInfoList");
+
+  const formAddPoints = document.getElementById("addPointsForm");
+  const nameInput = document.getElementById("nameInput");
+  const pointsInput = document.getElementById("pointsInput");
+  const reasonInput = document.getElementById("reasonInput");
+
+  // Formularios admin motivos
+  const formGanan = document.getElementById("formGanan");
+  const gananMotivoInput = document.getElementById("gananMotivoInput");
+  const gananPuntosInput = document.getElementById("gananPuntosInput");
+  const gananListAdmin = document.getElementById("gananListAdmin");
+
+  const formPierden = document.getElementById("formPierden");
+  const pierdenMotivoInput = document.getElementById("pierdenMotivoInput");
+  const pierdenPuntosInput = document.getElementById("pierdenPuntosInput");
+  const pierdenListAdmin = document.getElementById("pierdenListAdmin");
+
+  // Función para mostrar el modal contraseña
+  function showPasswordModal() {
+    passwordError.style.display = "none";
+    adminPasswordInput.value = "";
+    passwordModal.style.display = "block";
+    passwordModal.setAttribute("aria-hidden", "false");
+    adminPasswordInput.focus();
+  }
+
+  // Función para ocultar modal
+  function hidePasswordModal() {
+    passwordModal.style.display = "none";
+    passwordModal.setAttribute("aria-hidden", "true");
+  }
+
+  // Al hacer click en el botón modo admin, pedir contraseña
+  toggleAdminBtn.addEventListener("click", () => {
+    if (isAdmin) {
+      // Salir del modo admin
+      isAdmin = false;
+      adminPanel.classList.add("hidden");
+      toggleAdminBtn.textContent = "Modo Organizadora 🔐";
+      toggleAdminBtn.setAttribute("aria-pressed", "false");
+      hidePasswordModal();
+      renderRanking();
+      renderPointsGiven();
+      renderInfoList(); // refrescar info en modo normal
+    } else {
+      showPasswordModal();
+    }
+  });
+
+  // Ingreso contraseña
+  adminLoginBtn.addEventListener("click", () => {
+    const val = adminPasswordInput.value.trim();
+    if (val === PASSWORD) {
+      isAdmin = true;
+      adminPanel.classList.remove("hidden");
+      toggleAdminBtn.textContent = "Salir Modo Organizadora ❌";
+      toggleAdminBtn.setAttribute("aria-pressed", "true");
+      hidePasswordModal();
+      renderRanking();
+      renderPointsGiven();
+      renderInfoList();
+    } else {
+      passwordError.style.display = "block";
+      adminPasswordInput.focus();
+    }
+  });
+  adminPasswordInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      adminLoginBtn.click();
+    }
+  });
+
+  // Guardar datos localStorage
+  function saveData() {
+    localStorage.setItem("jeroPointsData", JSON.stringify(data));
+    localStorage.setItem("puntosGanadosMotivos", JSON.stringify(puntosGanadosMotivos));
+    localStorage.setItem("puntosPerdidosMotivos", JSON.stringify(puntosPerdidosMotivos));
+    localStorage.setItem("nextDetailId", nextDetailId.toString());
+  }
+
+  // Cargar datos localStorage
+  function loadData() {
+    const d = localStorage.getItem("jeroPointsData");
+    if (d) data = JSON.parse(d);
+    else data = [];
+
+    const pgm = localStorage.getItem("puntosGanadosMotivos");
+    if (pgm) puntosGanadosMotivos = JSON.parse(pgm);
+
+    const ppm = localStorage.getItem("puntosPerdidosMotivos");
+    if (ppm) puntosPerdidosMotivos = JSON.parse(ppm);
+
+    const nid = localStorage.getItem("nextDetailId");
+    if (nid) nextDetailId = Number(nid);
+  }
+
+  // Agregar puntos nuevo
+  function addPoints(nombre, puntos, motivo) {
+    const fecha = new Date().toLocaleDateString("es-PY");
+    let user = data.find((d) => d.nombre.toLowerCase() === nombre.toLowerCase());
+    if (!user) {
+      user = { nombre: nombre.trim(), puntos: 0, detalles: [] };
+      data.push(user);
+    }
+    user.puntos += puntos;
+    user.detalles.push({ fecha, puntos, motivo, id: nextDetailId++ });
+    saveData();
+  }
+
+  // Borrar punto dado (modo admin)
+  function removePoint(nombre, id) {
+    const user = data.find((d) => d.nombre.toLowerCase() === nombre.toLowerCase());
+    if (!user) return;
+    const idx = user.detalles.findIndex((det) => det.id === id);
+    if (idx === -1) return;
+    // Restar puntos antes de eliminar
+    user.puntos -= user.detalles[idx].puntos;
+    user.detalles.splice(idx, 1);
+    if (user.puntos < 0) user.puntos = 0;
+    saveData();
+  }
+
+  // Renderizar ranking (ordenado)
+  function renderRanking() {
+    // Ordenar descendente por puntos
+    data.sort((a, b) => b.puntos - a.puntos);
+    rankingBody.innerHTML = "";
+    data.forEach((user, i) => {
+      const tr = document.createElement("tr");
+      tr.setAttribute("tabindex", "0");
+      tr.setAttribute("role", "row");
+      tr.dataset.nombre = user.nombre;
+
+      const tdPos = document.createElement("td");
+      tdPos.textContent = i + 1;
+      tdPos.setAttribute("aria-label", "Posición");
+      if (i === 0) tdPos.innerHTML = '<span class="medalla oro">🥇</span>';
+      else if (i === 1) tdPos.innerHTML = '<span class="medalla plata">🥈</span>';
+      else if (i === 2) tdPos.innerHTML = '<span class="medalla bronce">🥉</span>';
+
+      const tdNombre = document.createElement("td");
+      tdNombre.textContent = user.nombre;
+
+      const tdPuntos = document.createElement("td");
+      tdPuntos.textContent = user.puntos;
+
+      tr.appendChild(tdPos);
+      tr.appendChild(tdNombre);
+      tr.appendChild(tdPuntos);
+
+      rankingBody.appendChild(tr);
+    });
+  }
+
+  // Mostrar detalle puntos al hacer click en fila ranking
+  rankingBody.addEventListener("click", (e) => {
+    let tr = e.target.closest("tr");
+    if (!tr) return;
+    const nombre = tr.dataset.nombre;
+    if (!nombre) return;
+    showDetails(nombre);
+  });
+  rankingBody.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" || e.key === " ") {
+      let tr = e.target.closest("tr");
+      if (!tr) return;
+      const nombre = tr.dataset.nombre;
+      if (!nombre) return;
+      showDetails(nombre);
+    }
+  });
+
+  // Mostrar detalle de puntos para una hermana
+  function showDetails(nombre) {
+    detailsBody.innerHTML = "";
+    const user = data.find((d) => d.nombre === nombre);
+    if (!user) return;
+    if (user.detalles.length === 0) {
+      const tr = document.createElement("tr");
+      const td = document.createElement("td");
+      td.colSpan = 4;
+      td.textContent = "No hay registros de puntos para esta hermana.";
+      td.style.fontStyle = "italic";
+      tr.appendChild(td);
+      detailsBody.appendChild(tr);
+    } else {
+      user.detalles.forEach((det) => {
+        const tr = document.createElement("tr");
+        const tdFecha = document.createElement("td");
+        tdFecha.textContent = det.fecha;
+        const tdPuntos = document.createElement("td");
+        tdPuntos.textContent = det.puntos > 0 ? "+" + det.puntos : det.puntos;
+        tdPuntos.style.color = det.puntos > 0 ? "green" : "red";
+        const tdMotivo = document.createElement("td");
+        tdMotivo.textContent = det.motivo;
+        const tdAccion = document.createElement("td");
+
+        // Botón borrar sólo si modo admin
+        if (isAdmin) {
+          const btnBorrar = document.createElement("button");
+          btnBorrar.textContent = "Eliminar";
+          btnBorrar.classList.add("show-in-admin");
+          btnBorrar.addEventListener("click", () => {
+            if (confirm(`¿Eliminar el registro "${det.motivo}" (${det.puntos} puntos) de ${nombre}?`)) {
+              removePoint(nombre, det.id);
+              showDetails(nombre);
+              renderRanking();
+              renderPointsGiven();
+            }
+          });
+          tdAccion.appendChild(btnBorrar);
+        }
+
+        tr.appendChild(tdFecha);
+        tr.appendChild(tdPuntos);
+        tr.appendChild(tdMotivo);
+        tr.appendChild(tdAccion);
+        detailsBody.appendChild(tr);
+      });
+    }
+    detailsSection.classList.remove("hidden");
+    detailsSection.focus();
+  }
+  closeDetailsBtn.addEventListener("click", () => {
+    detailsSection.classList.add("hidden");
+  });
+
+  // Render lista de puntos dados (modo admin)
+  function renderPointsGiven() {
+    if (!isAdmin) {
+      pointsGivenList.innerHTML = "";
+      return;
+    }
+    pointsGivenList.innerHTML = "";
+    data.forEach((user) => {
+      user.detalles.forEach((det) => {
+        const div = document.createElement("div");
+        div.className = "list-item";
+        div.textContent = `${user.nombre}: ${det.puntos > 0 ? "+" : ""}${det.puntos} pts - ${det.motivo}`;
+        pointsGivenList.appendChild(div);
+      });
+    });
+  }
+
+  // Render listas motivos admin
+  function renderMotivos() {
+    gananListAdmin.innerHTML = "";
+    puntosGanadosMotivos.forEach((item, i) => {
+      const div = document.createElement("div");
+      div.className = "list-item";
+      div.textContent = `+${item.puntos} - ${item.motivo}`;
+      const btn = document.createElement("button");
+      btn.textContent = "X";
+      btn.title = "Eliminar motivo";
+      btn.addEventListener("click", () => {
+        if (confirm(`Eliminar motivo para ganar puntos: "${item.motivo}"?`)) {
+          puntosGanadosMotivos.splice(i, 1);
+          saveData();
+          renderMotivos();
+          renderInfoList();
+        }
+      });
+      div.appendChild(btn);
+      gananListAdmin.appendChild(div);
+    });
+
+    pierdenListAdmin.innerHTML = "";
+    puntosPerdidosMotivos.forEach((item, i) => {
+      const div = document.createElement("div");
+      div.className = "list-item";
+      div.textContent = `-${item.puntos} - ${item.motivo}`;
+      const btn = document.createElement("button");
+      btn.textContent = "X";
+      btn.title = "Eliminar motivo";
+      btn.addEventListener("click", () => {
+        if (confirm(`Eliminar motivo para perder puntos: "${item.motivo}"?`)) {
+          puntosPerdidosMotivos.splice(i, 1);
+          saveData();
+          renderMotivos();
+          renderInfoList();
+        }
+      });
+      div.appendChild(btn);
+      pierdenListAdmin.appendChild(div);
+    });
+  }
+
+  // Render info lista motivos (modo normal)
+  function renderInfoList(ganan = true) {
+    pointsInfoList.innerHTML = "";
+    pointsInfoList.classList.remove("hidden");
+    let motivos = ganan ? puntosGanadosMotivos : puntosPerdidosMotivos;
+    motivos = motivos.slice().sort((a,b) => b.puntos - a.puntos);
+    motivos.forEach((item) => {
+      const p = document.createElement("p");
+      p.textContent = `${ganan ? "+" : "-"}${item.puntos} pts - ${item.motivo}`;
+      pointsInfoList.appendChild(p);
+    });
+  }
+
+  // Botones mostrar info
+  showPointsInfoBtn.addEventListener("click", () => {
+    const expanded = showPointsInfoBtn.getAttribute("aria-expanded") === "true";
+    if (expanded) {
+      pointsInfoList.classList.add("hidden");
+      showPointsInfoBtn.setAttribute("aria-expanded", "false");
+      showPointsInfoBtn.textContent = "¿Cómo se ganan puntos?";
+    } else {
+      renderInfoList(true);
+      pointsInfoList.classList.remove("hidden");
+      showPointsInfoBtn.setAttribute("aria-expanded", "true");
+      showPointsInfoBtn.textContent = "Ocultar motivos que ganan puntos";
+      // También ocultar otro botón
+      pointsInfoList.style.border = `2px solid var(--lila)`;
+    }
+  });
+  showPointsLostBtn.addEventListener("click", () => {
+    const expanded = showPointsLostBtn.getAttribute("aria-expanded") === "true";
+    if (expanded) {
+      pointsInfoList.classList.add("hidden");
+      showPointsLostBtn.setAttribute("aria-expanded", "false");
+      showPointsLostBtn.textContent = "¿Cómo se pierden puntos?";
+    } else {
+      renderInfoList(false);
+      pointsInfoList.classList.remove("hidden");
+      showPointsLostBtn.setAttribute("aria-expanded", "true");
+      showPointsLostBtn.textContent = "Ocultar motivos que pierden puntos";
+      pointsInfoList.style.border = `2px solid var(--lila)`;
+    }
+  });
+
+  // Form agregar puntos
+  formAddPoints.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const nombre = nameInput.value.trim();
+    const puntos = parseInt(pointsInput.value);
+    const motivo = reasonInput.value.trim();
+    if (!nombre || !puntos || !motivo) return alert("Completa todos los campos para agregar puntos.");
+    addPoints(nombre, puntos, motivo);
+    renderRanking();
+    renderPointsGiven();
+    nameInput.value = "";
+    pointsInput.value = "";
+    reasonInput.value = "";
+  });
+
+  // Form agregar motivo ganar puntos
+  formGanan.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const mot = gananMotivoInput.value.trim();
+    const pts = parseInt(gananPuntosInput.value);
+    if (!mot || !pts) return alert("Completa motivo y puntos para agregar.");
+    puntosGanadosMotivos.push({ motivo: mot, puntos: pts });
+    gananMotivoInput.value = "";
+    gananPuntosInput.value = "";
+    saveData();
+    renderMotivos();
+    renderInfoList(true);
+  });
+
+  // Form agregar motivo perder puntos
+  formPierden.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const mot = pierdenMotivoInput.value.trim();
+    const pts = parseInt(pierdenPuntosInput.value);
+    if (!mot || !pts) return alert("Completa motivo y puntos para agregar.");
+    puntosPerdidosMotivos.push({ motivo: mot, puntos: pts });
+    pierdenMotivoInput.value = "";
+    pierdenPuntosInput.value = "";
+    saveData();
+    renderMotivos();
+    renderInfoList(false);
+  });
+
+  // Init load
+  loadData();
+  renderRanking();
+  renderMotivos();
+
+  // Por defecto modo normal
+  adminPanel.classList.add("hidden");
+  detailsSection.classList.add("hidden");
+  pointsInfoList.classList.add("hidden");
+
+})();
+</script>
+
+</body>
+</html>
